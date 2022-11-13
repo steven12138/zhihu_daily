@@ -26,6 +26,7 @@ class DioService {
   }
 
   static Future<List<Story>> getNewsOn(DateTime date) async {
+    print("getting ${parseDate(date)}");
     var lateDate = date.add(const Duration(days: 1));
     var url = "$beforeURL/${parseDate(lateDate)}";
     var rawResult = (await dio.get(url)).toString();

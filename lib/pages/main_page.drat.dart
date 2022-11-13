@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:card_swiper/card_swiper.dart';
 import "package:flutter/material.dart";
+import 'package:zhihu_daily/components/daily_news.dart';
 import 'package:zhihu_daily/service/DioService.dart';
 
 import '../components/appbar.dart';
@@ -25,13 +26,13 @@ class _MainPageBodyState extends State<MainPageBody>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
-  late List<Story> posterNews = [];
-  late List<Story> latestNews = [];
-  late List<News> historyNews = [];
+  late List<Story> posterNews = [
+    Story(title: "", url: "", hint: "", imageUrl: "")
+  ];
 
   void _fresh() {
-    setState(() async {
-      posterNews = await DioService.getPosterNews();
+    setState(() {
+      DioService.getPosterNews().then((value) => posterNews = value);
     });
   }
 
@@ -52,91 +53,115 @@ class _MainPageBodyState extends State<MainPageBody>
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        SizedBox(
-          height: 350,
-          child: Swiper(
-            itemBuilder: (BuildContext context, int index) => GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  "news",
-                  arguments: posterNews[index].url,
-                );
-              },
-              child: SizedBox(
-                child: Stack(
-                  children: [
-                    SizedBox(
-                      height: double.infinity,
-                      width: double.infinity,
-                      child: Image.network(
-                        posterNews[index].imageUrl,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      height: 100,
-                      bottom: 0,
-                      child: ClipRect(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
-                          child: Container(
-                            alignment: Alignment.topLeft,
-                            color: Colors.black.withOpacity(0),
-                            child: Container(
-                              margin: const EdgeInsets.all(10),
-                              child: ListView(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.only(bottom: 5),
-                                    height: 50,
-                                    child: Text(
-                                      posterNews[index].title,
-                                      softWrap: true,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    posterNews[index].hint,
-                                    style: TextStyle(
-                                      color: Colors.grey.shade100,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+    var swiper = SizedBox(
+      height: 350,
+      child: Swiper(
+        itemBuilder: (BuildContext context, int index) {
+          var shade1 = ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
+              child: Container(
+                alignment: Alignment.topLeft,
+                color: Colors.black.withOpacity(0),
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  child: ListView(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 5),
+                        height: 50,
+                        child: Text(
+                          posterNews[index].title,
+                          softWrap: true,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      Text(
+                        posterNews[index].hint,
+                        style: TextStyle(
+                          color: Colors.grey.shade100,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            control: null,
-            duration: 2,
-            fade: 0.5,
-            physics: const ScrollPhysics(),
-            itemCount: posterNews.length,
-            pagination: const SwiperPagination(
-              alignment: Alignment.bottomRight,
-              margin: EdgeInsets.only(
-                bottom: 10,
-                right: 20,
+          );
+
+          return GestureDetector(
+            onTap: () => Navigator.pushNamed(
+              context,
+              "news",
+              arguments: posterNews[index].url,
+            ),
+            child: SizedBox(
+              child: Stack(
+                children: [
+                  SizedBox(
+                    height: double.infinity,
+                    width: double.infinity,
+                    child: Image.network(
+                      posterNews[index].imageUrl,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    height: 100,
+                    bottom: 0,
+                    child: shade1,
+                  ),
+                ],
               ),
             ),
+          );
+        },
+        control: null,
+        duration: 2,
+        fade: 0.5,
+        physics: const ScrollPhysics(),
+        itemCount: posterNews.length,
+        pagination: const SwiperPagination(
+          builder: DotSwiperPaginationBuilder(
+            color: Colors.black45,
+            activeColor: Colors.white,
+            size: 5,
+            activeSize: 5,
+          ),
+          alignment: Alignment.bottomRight,
+          margin: EdgeInsets.only(
+            bottom: 10,
+            right: 20,
           ),
         ),
+      ),
+    );
+
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 0) return swiper;
+        if (index == 1) return DailyNews(date: DateTime.now());
+        int daysBefore = index - 2;
+        return DailyNewsTemplate(
+          date: DateTime.now().subtract(
+            Duration(days: daysBefore),
+          ),
+        );
+      },
+    );
+
+    return ListView(
+      children: [
+        swiper,
+        DailyNewsTemplate(date: DateTime.now()),
       ],
     );
   }
