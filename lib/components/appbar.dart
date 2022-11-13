@@ -8,9 +8,8 @@ PreferredSizeWidget zBar(BuildContext context) {
     actions: [
       Center(
         child: InkWell(
-          onTap: () {
-            Navigator.pushNamed(context, "news",
-                arguments: "https://cn.bing.com");
+          onTap: () async {
+            // var result = await DioService.getDailyNews();
           },
           child: Container(
             margin: const EdgeInsets.all(8),

@@ -1,17 +1,11 @@
 class News {
-  String date;
+  DateTime date;
   List<Story> stories;
 
   News({
     required this.date,
     required this.stories,
   });
-
-  factory News.fromJSON(Map<String, dynamic> json) => News(
-        date: json["date"],
-        stories:
-            List<Story>.from(json["stories"].map((x) => Story.fromJSON(x))),
-      );
 }
 
 class Story {
