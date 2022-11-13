@@ -57,61 +57,70 @@ class _MainPageBodyState extends State<MainPageBody>
         SizedBox(
           height: 350,
           child: Swiper(
-            itemBuilder: (BuildContext context, int index) => SizedBox(
-              child: Stack(
-                children: [
-                  SizedBox(
-                    height: double.infinity,
-                    width: double.infinity,
-                    child: Image.network(
-                      posterNews[index].imageUrl,
-                      fit: BoxFit.cover,
+            itemBuilder: (BuildContext context, int index) => GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  "news",
+                  arguments: posterNews[index].url,
+                );
+              },
+              child: SizedBox(
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      height: double.infinity,
+                      width: double.infinity,
+                      child: Image.network(
+                        posterNews[index].imageUrl,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    height: 100,
-                    bottom: 0,
-                    child: ClipRect(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
-                        child: Container(
-                          alignment: Alignment.topLeft,
-                          color: Colors.black.withOpacity(0),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      height: 100,
+                      bottom: 0,
+                      child: ClipRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
                           child: Container(
-                            margin: const EdgeInsets.all(10),
-                            child: ListView(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(bottom: 5),
-                                  height: 50,
-                                  child: Text(
-                                    posterNews[index].title,
-                                    softWrap: true,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
+                            alignment: Alignment.topLeft,
+                            color: Colors.black.withOpacity(0),
+                            child: Container(
+                              margin: const EdgeInsets.all(10),
+                              child: ListView(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 5),
+                                    height: 50,
+                                    child: Text(
+                                      posterNews[index].title,
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  posterNews[index].hint,
-                                  style: TextStyle(
-                                    color: Colors.grey.shade100,
-                                    fontSize: 14,
+                                  Text(
+                                    posterNews[index].hint,
+                                    style: TextStyle(
+                                      color: Colors.grey.shade100,
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             control: null,
