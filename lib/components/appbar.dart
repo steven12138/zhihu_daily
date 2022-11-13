@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:zhihu_daily/service/DioService.dart';
 
-PreferredSizeWidget zBar() {
+PreferredSizeWidget zBar(BuildContext context) {
   return AppBar(
     backgroundColor: Colors.white,
     title: const Date(),
     actions: [
       Center(
-        child: Container(
-          margin: const EdgeInsets.all(8),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(50),
-            child: Image.asset(
-              "assets/avatar.png",
-              fit: BoxFit.fitHeight,
+        child: InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, "news",
+                arguments: "https://cn.bing.com");
+          },
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: Image.asset(
+                "assets/avatar.png",
+                fit: BoxFit.fitHeight,
+              ),
             ),
           ),
         ),
@@ -77,10 +84,10 @@ class Date extends StatelessWidget {
         ),
         Container(
             decoration: BoxDecoration(
-              color: Colors.black54,
+              color: Colors.black38,
               borderRadius: BorderRadius.circular(10),
             ),
-            width: 1.5,
+            width: 1,
             height: 35,
             margin: const EdgeInsetsDirectional.only(
               start: 10,
