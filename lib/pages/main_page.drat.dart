@@ -94,7 +94,7 @@ class _MainPageBodyState extends State<MainPageBody>
   @override
   Widget build(BuildContext context) {
     var swiper = SizedBox(
-      height: 350,
+      height: 390,
       child: Swiper(
         itemBuilder: (BuildContext context, int index) {
           var shade1 = ClipRect(
@@ -105,7 +105,8 @@ class _MainPageBodyState extends State<MainPageBody>
                 color: Colors.black.withOpacity(0),
                 child: Container(
                   margin: const EdgeInsets.all(10),
-                  child: ListView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         margin: const EdgeInsets.only(bottom: 5),
@@ -121,11 +122,16 @@ class _MainPageBodyState extends State<MainPageBody>
                           ),
                         ),
                       ),
-                      Text(
-                        posterNews[index].hint,
-                        style: TextStyle(
-                          color: Colors.grey.shade100,
-                          fontSize: 14,
+                      Container(
+                        margin: const EdgeInsets.only(
+                          top: 10,
+                        ),
+                        child: Text(
+                          posterNews[index].hint,
+                          style: TextStyle(
+                            color: Colors.grey.shade300,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ],
@@ -155,7 +161,7 @@ class _MainPageBodyState extends State<MainPageBody>
                   Positioned(
                     left: 0,
                     right: 0,
-                    height: 100,
+                    height: 120,
                     bottom: 0,
                     child: shade1,
                   ),
