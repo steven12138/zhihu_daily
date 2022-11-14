@@ -7,7 +7,7 @@ void main() {
 }
 
 const noneScheme = ColorScheme(
-  primary: Colors.white,
+  primary: Colors.blue,
   brightness: Brightness.light,
   onPrimary: Colors.black,
   secondary: Colors.grey,

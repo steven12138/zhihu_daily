@@ -35,53 +35,29 @@ class Article extends StatelessWidget {
   }
 }
 
-class DailyNews extends StatefulWidget {
-  const DailyNews({Key? key, required this.date}) : super(key: key);
+class DailyTemplate extends StatelessWidget {
+  const DailyTemplate({
+    Key? key,
+    required this.newsList,
+  }) : super(key: key);
 
-  final DateTime date;
-
-  @override
-  State<DailyNews> createState() => _DailyNewsState();
-}
-
-class _DailyNewsState extends State<DailyNews>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  late List<Story> newsList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      print(widget.date);
-      newsList = await DioService.getNewsOn(widget.date);
-      setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  final List<Story> newsList;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: newsList.map((e) => Article(article: e)).toList(),
     );
-    return ListView(
-      children: newsList.map((e) => Article(article: e)).toList(),
-    );
   }
 }
 
-class DailyNewsTemplate extends StatelessWidget {
-  const DailyNewsTemplate({Key? key, required this.date}) : super(key: key);
+class Daily extends StatelessWidget {
+  const Daily({
+    Key? key,
+    required this.news,
+  }) : super(key: key);
 
-  final DateTime date;
+  final News news;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +73,7 @@ class DailyNewsTemplate extends StatelessWidget {
               left: 20,
             ),
             child: Text(
-              "${date.month}月${date.day}日",
+              "${news.date.month}月${news.date.day}日",
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w500,
@@ -123,7 +99,9 @@ class DailyNewsTemplate extends StatelessWidget {
     return Column(
       children: [
         myDivider,
-        DailyNews(date: date),
+        DailyTemplate(
+          newsList: news.stories,
+        ),
       ],
     );
   }

@@ -26,13 +26,41 @@ class _MainPageBodyState extends State<MainPageBody>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
+  final ScrollController _scrollController = ScrollController();
+
   late List<Story> posterNews = [
     Story(title: "", url: "", hint: "", imageUrl: "")
   ];
 
-  void _fresh() {
+  late News currentNews;
+
+  List<News> pastNews = [];
+
+  DateTime lastNews = DateTime.now();
+  bool loaded = false;
+
+  bool loadMore = false;
+
+  Future<void> _freshMore(int count) async {
+    for (int i = 1; i <= count; i++) {
+      lastNews = lastNews.subtract(const Duration(days: 1));
+      pastNews.add(News(
+        date: lastNews,
+        stories: await DioService.getNewsOn(lastNews),
+      ));
+    }
+  }
+
+  Future<void> _fresh() async {
+    posterNews = await DioService.getPosterNews();
+    currentNews = News(
+      date: DateTime.now(),
+      stories: await DioService.getDailyNews(),
+    );
+    lastNews = DateTime.now();
+    await _freshMore(3);
     setState(() {
-      DioService.getPosterNews().then((value) => posterNews = value);
+      loaded = true;
     });
   }
 
@@ -40,6 +68,18 @@ class _MainPageBodyState extends State<MainPageBody>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    _scrollController.addListener(() async {
+      if (_scrollController.position.pixels >
+          _scrollController.position.maxScrollExtent - 40) {
+        if (!loadMore) {
+          loadMore = true;
+          await _freshMore(2);
+          setState(() {
+            loadMore = false;
+          });
+        }
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _fresh();
     });
@@ -144,25 +184,46 @@ class _MainPageBodyState extends State<MainPageBody>
         ),
       ),
     );
+    if (!loaded) {
+      return Column(
+        children: const [
+          Padding(
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Colors.blue,
+              ),
+            ),
+          )
+        ],
+      );
+    }
 
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        if (index == 0) return swiper;
-        if (index == 1) return DailyNews(date: DateTime.now());
-        int daysBefore = index - 2;
-        return DailyNewsTemplate(
-          date: DateTime.now().subtract(
-            Duration(days: daysBefore),
-          ),
-        );
-      },
-    );
-
-    return ListView(
-      children: [
-        swiper,
-        DailyNewsTemplate(date: DateTime.now()),
-      ],
+    return RefreshIndicator(
+      onRefresh: _fresh,
+      child: ListView.builder(
+        controller: _scrollController,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) return swiper;
+          if (index == 1) return DailyTemplate(newsList: currentNews.stories);
+          if (index - 2 >= pastNews.length) {
+            return Column(
+              children: const [
+                Padding(
+                  padding: EdgeInsets.only(top: 5, bottom: 10),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.blue,
+                    ),
+                  ),
+                )
+              ],
+            );
+          }
+          return Daily(news: pastNews[index - 2]);
+        },
+        itemCount: pastNews.length + 3,
+      ),
     );
   }
 }
